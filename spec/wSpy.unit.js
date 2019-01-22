@@ -11,7 +11,7 @@ const nodeHost = {
 const settings = {
 	moreLogs: 'mobx,createDisplayedPage,livepreview,ds_GETTER',
 	includeLogs: 'setHook,registerAction,runAction,worker,applyHook,ds_ACTION,ds_DATA_MANIPULATION_ACTION,dispatch',
-    extraIgnoredEvents: [
+	extraIgnoredEvents: [
 		'wixCode.fileSystem.getRoots',
 		'wixCode.log.trace',
 		'bi.event',
