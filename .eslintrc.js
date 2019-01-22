@@ -4,6 +4,7 @@ module.exports = {
     ],
     'env': {
         'browser': true,
+        'node': true,
         'commonjs': true,
         'es6': true,
         'jasmine': true
@@ -64,4 +65,4 @@ module.exports = {
         'jasmine/no-disabled-tests': 'error',
         'jasmine/missing-expect': 'error'
     }
-};
+}

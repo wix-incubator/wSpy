@@ -15,7 +15,7 @@ describe('wSpy', () => {
 		return initSpy.init({...nodeHost, wSpyParam: param})
 	}
 	describe('log', () => {
-		it('should not log when logName isnt on defaults', () => {
+		it('should not log when logName isn\'t on defaults', () => {
 			const wSpy = getSpyWithParam()
 
 			wSpy.log('operation', [], [])
@@ -23,7 +23,7 @@ describe('wSpy', () => {
 			expect(wSpy.logs).toEqual({})
 		})
 
-		it('should not log when record isnt array', () => {
+		it('should not log when record isn\'t array', () => {
 			const wSpy = getSpyWithParam()
 
 			wSpy.log('setHook', {}, [])
@@ -47,7 +47,7 @@ describe('wSpy', () => {
 			expect(wSpy.logs.mobx.length).not.toBe(0)
 		})
 
-		it('should add new logs also when multple extra params', () => {
+		it('should add new logs also when multiple extra params', () => {
 			const wSpy = getSpyWithParam('mobx,ds_GETTER')
 
 			wSpy.log('mobx', [], [])
@@ -84,7 +84,7 @@ describe('wSpy', () => {
 
 		const func = () => null
 
-		it('should log a callback registeration', () => {
+		it('should log a callback registration', () => {
 			const wSpy = getSpyWithParam()
 
 			wSpy.logCallBackRegistration(func, 'registerAction', func.name, 'ActionQueue')
@@ -92,7 +92,7 @@ describe('wSpy', () => {
 			expect(wSpy.logs.registerAction.length).not.toBeLessThan(0)
 		})
 
-		it('should log a callback excecution', () => {
+		it('should log a callback execution', () => {
 			const wSpy = getSpyWithParam()
 
 			wSpy.logCallBackExecution(func, 'runAction', func.name, 'ActionQueue')
