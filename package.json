@@ -7,7 +7,8 @@
     "test": "test"
   },
   "scripts": {
-    "test": "test"
+    "test": "jasmine",
+    "lint": "./node_modules/.bin/eslint ."
   },
   "repository": {
     "type": "git",
@@ -18,5 +19,13 @@
   "bugs": {
     "url": "https://github.com/wix-incubator/wSpy/issues"
   },
-  "homepage": "https://github.com/wix-incubator/wSpy#readme"
+  "homepage": "https://github.com/wix-incubator/wSpy#readme",
+  "dependencies": {
+    "lodash": "^4.17.11"
+  },
+  "devDependencies": {
+    "eslint": "^5.12.1",
+    "eslint-plugin-jasmine": "^2.10.1",
+    "jasmine": "^3.3.1"
+  }
 }
