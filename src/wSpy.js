@@ -13,7 +13,6 @@ const settings = {
 const MAX_LOG_SIZE = 10000
 const DEFAULT_LOGS_COUNT = 300
 const GROUP_MIN_LEN = 5
-const {ignoredDSEvents, stackFilter} = settings
 
 function isRegex(pattern) {
 	return Object.prototype.toString.call(pattern) === '[object RegExp]'
@@ -40,7 +39,7 @@ function getSpy({Error, memoryUsage, frame, wSpyParam}) {
 			}
 		},
 		shouldLog(logName, record) {
-			return Array.isArray(record) && this.includeLogs[logName] && !ignoredDSEvents.includes(record[0])
+			return Array.isArray(record) && this.includeLogs[logName] && !settings.ignoredDSEvents.includes(record[0])
 		},
 		log(logName, record, takeFrom) {
 			this.init()
@@ -172,7 +171,7 @@ function getSpy({Error, memoryUsage, frame, wSpyParam}) {
 			}
 			let stackTrace = windows.reverse().map(window => new window.Error().stack).join('\n').split(/\r|\n/).map(x => x.trim()).slice(4).
 				filter(line => line !== 'Error').
-				filter(line => !stackFilter.test(line))
+				filter(line => !settings.stackFilter.test(line))
 			if (takeFrom) {
 				const firstIndex = stackTrace.findIndex(line => line.indexOf(takeFrom) !== -1)
 				stackTrace = stackTrace.slice(firstIndex + 1)
