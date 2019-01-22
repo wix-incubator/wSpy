@@ -1,0 +1,22 @@
+{
+  "name": "wspy",
+  "version": "1.1.0",
+  "description": "Smart log of sync and async operation queues with stack-traces for debugging",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wix-incubator/wSpy.git"
+  },
+  "author": "yinonc shaiby",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/wix-incubator/wSpy/issues"
+  },
+  "homepage": "https://github.com/wix-incubator/wSpy#readme"
+}
