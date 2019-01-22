@@ -1,6 +1,4 @@
 'use strict'
-const _ = require('lodash')
-
 const settings = {
 	moreLogs: 'mobx,createDisplayedPage,livepreview,ds_GETTER',
 	includeLogs: 'setHook,registerAction,runAction,worker,applyHook,ds_ACTION,ds_DATA_MANIPULATION_ACTION,dispatch',
@@ -35,12 +33,10 @@ function getSpy({Error, memoryUsage, frame, wSpyParam}) {
 			if (!this.includeLogs) {
 				const includeLogsFromParam = (wSpyParam || '').split(',').filter(x => x[0] !== '-').filter(x => x)
 				const excludeLogsFromParam = (wSpyParam || '').split(',').filter(x => x[0] === '-').map(x => x.slice(1))
-				this.includeLogs = _(settings.includeLogs).
-					split(',').
-					concat(includeLogsFromParam).
-					reject(x => excludeLogsFromParam.indexOf(x) !== -1).
-					keyBy(x => x).
-					value()
+				this.includeLogs = settings.includeLogs.split(',').concat(includeLogsFromParam).filter(log => excludeLogsFromParam.indexOf(log) === -1).reduce((acc, log) => {
+					acc[log] = true
+					return acc
+				}, {})
 			}
 		},
 		shouldLog(logName, record) {
@@ -62,8 +58,8 @@ function getSpy({Error, memoryUsage, frame, wSpyParam}) {
 			if (this.logs[logName].length > MAX_LOG_SIZE) {
 				this.logs[logName] = this.logs[logName].slice(-1 * Math.floor(MAX_LOG_SIZE / 2))
 			}
-			if (!record[0]) {
-				record[0] = record.source && record.source[0]
+			if (!record[0] && record.source) {
+				record[0] = record.source[0]
 			}
 			this.logs[logName].push(record)
 		},
@@ -121,17 +117,16 @@ function getSpy({Error, memoryUsage, frame, wSpyParam}) {
 			return this.merged().slice(countFromEnd)
 		},
 		merged(filter) {
-			return _(this.logs).keys().flatMap(module =>
-				_(this.logs[module]).map(arr => {
+			return [].concat.apply([], Object.keys(this.logs).filter(log => Array.isArray(this.logs[log])).map(module =>
+				this.logs[module].map(arr => {
 					const res = [arr.index, module, ...arr]
 					systemProps.forEach(p => {
 						res[p] = arr[p]
 					})
 					return res
-				}).value()).
+				}))).
 				filter((e, i, src) => !filter || filter(e, i, src)).
-				sort((x, y) => x.index - y.index).
-				value()
+				sort((x, y) => x.index - y.index)
 		},
 		grouped(filter) {
 			const merged = this.merged(filter)
@@ -168,9 +163,6 @@ function getSpy({Error, memoryUsage, frame, wSpyParam}) {
 		},
 		groupedNoMobx(filter) {
 			return this.grouped((e, i, src) => e[1] !== 'mobx' && (!filter || filter(e, i, src)))
-		},
-		enabled() {
-			return true // enabled is noop if wspy is closed. (only for devs)
 		},
 		source(takeFrom) {
 			Error.stackTraceLimit = 50
