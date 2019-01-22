@@ -1,18 +1,5 @@
 'use strict'
-const settings = {
-	moreLogs: 'mobx,createDisplayedPage,livepreview,ds_GETTER',
-	includeLogs: 'setHook,registerAction,runAction,worker,applyHook,ds_ACTION,ds_DATA_MANIPULATION_ACTION,dispatch',
-	ignoredDSEvents: [
-		'wixCode.fileSystem.getRoots',
-		'wixCode.log.trace',
-		'bi.event',
-		'platform.reportAPICallBI'
-	],
-	stackFilter: /wSpy|publicMethodUtils|bundle.js|ActionQueue.js|require.min.js|main-r.min.js|observableDataUtil.js|lodash|mobxDataHandlers.js|react-dom|createEditorStore.js|coreUtils.js|create-react-class.js|redux-libs.js|throttledStore.js|raven.min.js|Object.store.dispatch|react.development/i
-}
-const MAX_LOG_SIZE = 10000
-const DEFAULT_LOGS_COUNT = 300
-const GROUP_MIN_LEN = 5
+const systemProps = ['index', 'time', '_time', 'mem', 'source']
 
 function isRegex(pattern) {
 	return Object.prototype.toString.call(pattern) === '[object RegExp]'
@@ -22,8 +9,7 @@ function isString(pattern) {
 	return typeof pattern === 'string' || pattern instanceof String
 }
 
-const systemProps = ['index', 'time', '_time', 'mem', 'source']
-function getSpy({Error, memoryUsage, frame, wSpyParam}) {
+function getSpy({Error, memoryUsage, frame, wSpyParam, settings}) {
 	return {
 		ver: 3,
 		logs: {},
@@ -39,7 +25,7 @@ function getSpy({Error, memoryUsage, frame, wSpyParam}) {
 			}
 		},
 		shouldLog(logName, record) {
-			return Array.isArray(record) && this.includeLogs[logName] && !settings.ignoredDSEvents.includes(record[0])
+			return Array.isArray(record) && this.includeLogs[logName] && !settings.extraIgnoredEvents.includes(record[0])
 		},
 		log(logName, record, takeFrom) {
 			this.init()
@@ -54,8 +40,8 @@ function getSpy({Error, memoryUsage, frame, wSpyParam}) {
 			record._time = `${now.getSeconds()}:${now.getMilliseconds()}`
 			record.time = now.getTime()
 			record.mem = memoryUsage() / 1000000
-			if (this.logs[logName].length > MAX_LOG_SIZE) {
-				this.logs[logName] = this.logs[logName].slice(-1 * Math.floor(MAX_LOG_SIZE / 2))
+			if (this.logs[logName].length > settings.MAX_LOG_SIZE) {
+				this.logs[logName] = this.logs[logName].slice(-1 * Math.floor(settings.MAX_LOG_SIZE / 2))
 			}
 			if (!record[0] && record.source) {
 				record[0] = record.source[0]
@@ -105,14 +91,14 @@ function getSpy({Error, memoryUsage, frame, wSpyParam}) {
 			})
 		},
 		purge(count) {
-			const countFromEnd = -1 * (count || DEFAULT_LOGS_COUNT)
+			const countFromEnd = -1 * (count || settings.DEFAULT_LOGS_COUNT)
 			Object.keys(this.logs).forEach(log => this.logs[log] = this.logs[log].slice(countFromEnd))
 		},
 		clear() {
 			Object.keys(this.logs).forEach(log => this.logs[log] = [])
 		},
 		recent(count) {
-			const countFromEnd = -1 * (count || DEFAULT_LOGS_COUNT)
+			const countFromEnd = -1 * (count || settings.DEFAULT_LOGS_COUNT)
 			return this.merged().slice(countFromEnd)
 		},
 		merged(filter) {
@@ -129,7 +115,7 @@ function getSpy({Error, memoryUsage, frame, wSpyParam}) {
 		},
 		grouped(filter) {
 			const merged = this.merged(filter)
-			const countFromEnd = -1 * DEFAULT_LOGS_COUNT
+			const countFromEnd = -1 * settings.DEFAULT_LOGS_COUNT
 			return [].concat.apply([], merged.reduce((acc, curr, i, arr) => {
 				const group = acc[acc.length - 1]
 				if (!group) {
@@ -138,16 +124,16 @@ function getSpy({Error, memoryUsage, frame, wSpyParam}) {
 				if (curr[1] === group[0][1]) {
 					group.push(curr)
 				} else {
-					if (group.length > GROUP_MIN_LEN) {
+					if (group.length > settings.GROUP_MIN_LEN) {
 						group.unshift(`[${group.length}] ${group[0][1]}`)
 					}
 					acc.push(newGroup(curr))
 				}
-				if (i === arr.length - 1 && group.length > GROUP_MIN_LEN) {
+				if (i === arr.length - 1 && group.length > settings.GROUP_MIN_LEN) {
 					group.unshift(`[${group.length}] ${group[0][1]}`)
 				}
 				return acc
-			}, []).map(e => e.length > GROUP_MIN_LEN ? [e] : e)).
+			}, []).map(e => e.length > settings.GROUP_MIN_LEN ? [e] : e)).
 				slice(countFromEnd).
 				map((x, i, arr) => {
 					const delay = i === 0 ? 0 : x.time - arr[i - 1].time

@@ -8,11 +8,26 @@ const nodeHost = {
 	frame: global
 }
 
+const settings = {
+	moreLogs: 'mobx,createDisplayedPage,livepreview,ds_GETTER',
+	includeLogs: 'setHook,registerAction,runAction,worker,applyHook,ds_ACTION,ds_DATA_MANIPULATION_ACTION,dispatch',
+	ignoredDSEvents: [
+		'wixCode.fileSystem.getRoots',
+		'wixCode.log.trace',
+		'bi.event',
+		'platform.reportAPICallBI'
+	],
+	MAX_LOG_SIZE: 10000,
+	DEFAULT_LOGS_COUNT: 300,
+	GROUP_MIN_LEN: 5,
+	stackFilter: /wSpy|publicMethodUtils|bundle.js|ActionQueue.js|require.min.js|main-r.min.js|observableDataUtil.js|lodash|mobxDataHandlers.js|react-dom|createEditorStore.js|coreUtils.js|create-react-class.js|redux-libs.js|throttledStore.js|raven.min.js|Object.store.dispatch|react.development/i
+}
+
 const wSpySystemProps = ['index', 'time', '_time', 'mem', 'source']
 
 describe('wSpy', () => {
 	function getSpyWithParam(param) {
-		return initSpy.init({...nodeHost, wSpyParam: param})
+		return initSpy.init({...nodeHost, wSpyParam: param, settings})
 	}
 	describe('log', () => {
 		it('should not log when logName isn\'t on defaults', () => {
