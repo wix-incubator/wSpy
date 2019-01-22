@@ -17,6 +17,14 @@ const DEFAULT_LOGS_COUNT = 300
 const GROUP_MIN_LEN = 5
 const {ignoredDSEvents, stackFilter} = settings
 
+function isRegex(pattern) {
+	return Object.prototype.toString.call(pattern) === '[object RegExp]'
+}
+
+function isString(pattern) {
+	return typeof pattern === 'string' || pattern instanceof String
+}
+
 const systemProps = ['index', 'time', '_time', 'mem', 'source']
 function getSpy({Error, memoryUsage, frame, wSpyParam}) {
 	return {
@@ -30,7 +38,7 @@ function getSpy({Error, memoryUsage, frame, wSpyParam}) {
 				this.includeLogs = _(settings.includeLogs).
 					split(',').
 					concat(includeLogsFromParam).
-					reject(x => _.includes(excludeLogsFromParam, x)).
+					reject(x => excludeLogsFromParam.indexOf(x) !== -1).
 					keyBy(x => x).
 					value()
 			}
@@ -55,7 +63,7 @@ function getSpy({Error, memoryUsage, frame, wSpyParam}) {
 				this.logs[logName] = this.logs[logName].slice(-1 * Math.floor(MAX_LOG_SIZE / 2))
 			}
 			if (!record[0]) {
-				record[0] = _.head(record.source)
+				record[0] = record.source && record.source[0]
 			}
 			this.logs[logName].push(record)
 		},
@@ -63,17 +71,23 @@ function getSpy({Error, memoryUsage, frame, wSpyParam}) {
 			if (!cb) {
 				return
 			}
-			if (!cb.name || _.startsWith(cb.name, 'bound ')) {
-				return _.head(cb.source || this.source(takeFrom))
+			if (!cb.name || isString(cb.name) && cb.name.startsWith('bound ')) {
+				if (Array.isArray(cb.source)) {
+					return cb.source[0]
+				}
+				const nameFromSource = this.source(takeFrom)
+				if (Array.isArray(nameFromSource)) {
+					return nameFromSource
+				}
 			}
-			return _.trim(cb.name)
+			return cb.name.trim()
 		},
 		search(pattern) {
-			if (Object.prototype.toString.call(pattern) === '[object RegExp]') {
+			if (isRegex(pattern)) {
 				return this.merged(x => pattern.test(x.join(' ')))
-			} else if (_.isString(pattern)) {
-				return this.merged(x => _.includes(x.join(' '), pattern))
-			} else if (_.isNumber(pattern)) {
+			} else if (isString(pattern)) {
+				return this.merged(x => x.join(' ').indexOf(pattern) !== -1)
+			} else if (Number.isInteger(pattern)) {
 				return this.merged().slice(-1 * pattern)
 			}
 		},
@@ -97,14 +111,10 @@ function getSpy({Error, memoryUsage, frame, wSpyParam}) {
 		},
 		purge(count) {
 			const countFromEnd = -1 * (count || DEFAULT_LOGS_COUNT)
-			_(this.logs).keys().forEach(log => {
-				this.logs[log] = this.logs[log].slice(countFromEnd) 
-			})
+			Object.keys(this.logs).forEach(log => this.logs[log] = this.logs[log].slice(countFromEnd))
 		},
 		clear() {
-			_(this.logs).keys().forEach(log => {
-				this.logs[log] = [] 
-			})
+			Object.keys(this.logs).forEach(log => this.logs[log] = [])
 		},
 		recent(count) {
 			const countFromEnd = -1 * (count || DEFAULT_LOGS_COUNT)
@@ -172,7 +182,7 @@ function getSpy({Error, memoryUsage, frame, wSpyParam}) {
 				filter(line => line !== 'Error').
 				filter(line => !stackFilter.test(line))
 			if (takeFrom) {
-				const firstIndex = stackTrace.findIndex(line => _.includes(line, takeFrom))
+				const firstIndex = stackTrace.findIndex(line => line.indexOf(takeFrom) !== -1)
 				stackTrace = stackTrace.slice(firstIndex + 1)
 			}
 			const line = stackTrace[0] || ''
