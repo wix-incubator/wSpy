@@ -10,6 +10,7 @@ function isString(pattern) {
 }
 
 function getSpy({Error, memoryUsage, frame, wSpyParam, settings}) {
+	// TODO: yinonc add validations on settings
 	return {
 		ver: 3,
 		logs: {},
