@@ -9,7 +9,12 @@ function isString(pattern) {
 	return typeof pattern === 'string' || pattern instanceof String
 }
 
-function getSpy({Error, memoryUsage, frame, wSpyParam, settings}) {
+function getSpy(options) {
+	const Error = options.Error
+	const frame = options.frame
+	const settings = options.settings
+	const wSpyParam = options.wSpyParam
+	const memoryUsage = options.memoryUsage
 	// TODO: yinonc add validations on settings
 	return {
 		ver: 4,

@@ -30,7 +30,10 @@ function firstSpyLoaded() {
 	}
 }
 
-function init({wSpyOverrideParam, settings}) {
+function init(options) {
+	const wSpyOverrideParam = options.wSpyOverrideParam
+	const settings = options.settings
+
 	const shouldSpy = hasWindowWithParent()
 	const wSpyParam = shouldSpy ? wSpyOverrideParam || getSpyParam(window.parent.location.href) : null
 	const wSpy = initSpy.init(shouldSpy ? {
