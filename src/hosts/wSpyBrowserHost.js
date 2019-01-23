@@ -59,7 +59,7 @@ function init({wSpyOverrideParam, settings}) {
 		}
 		if (hasWindowWithParent()) {
 			window.parent.wSpy = wSpy
-			wSpy.initStack = new Error().stack
+			// wSpy.initStack = new Error().stack
 			return wSpy
 		}
 		return noopSpy
