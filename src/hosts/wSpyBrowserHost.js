@@ -38,7 +38,6 @@ function init({wSpyOverrideParam, settings}) {
 		wSpyParam: wSpyOverrideParam || getSpyParam(window.location.href),
 		settings: Object.assign({}, defaultSettings, settings)
 	} : {})
-	console.log(wSpy)
 
 	const noopSpy = {}
 	Object.keys(wSpy).forEach(key => noopSpy[key] = () => {})
@@ -60,7 +59,7 @@ function init({wSpyOverrideParam, settings}) {
 		}
 		if (hasWindowWithParent()) {
 			window.parent.wSpy = wSpy
-			// wSpy.initStack = new Error().stack
+			wSpy.initStack = new Error().stack
 			return wSpy
 		}
 		return noopSpy
