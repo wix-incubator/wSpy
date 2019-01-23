@@ -31,12 +31,13 @@ function firstSpyLoaded() {
 }
 
 function init({wSpyOverrideParam, settings}) {
-	const wSpyParam = wSpyOverrideParam || getSpyParam(window.location.href)
-	const wSpy = initSpy.init(hasWindowWithParent() ? {
+    const hasWindowWithParent = hasWindowWithParent()
+	const wSpyParam = hasWindowWithParent ? wSpyOverrideParam || getSpyParam(window.parent.location.href) : null;
+	const wSpy = initSpy.init(hasWindowWithParent ? {
 		Error: window.Error,
 		memoryUsage: () => window.performance.memory.usedJSHeapSize,
 		frame: window,
-		wSpyParam: wSpyOverrideParam || getSpyParam(window.location.href),
+		wSpyParam: wSpyOverrideParam || getSpyParam(window.parent.location.href),
 		settings: Object.assign({}, defaultSettings, settings)
 	} : {})
 
@@ -62,7 +63,7 @@ function init({wSpyOverrideParam, settings}) {
 			}
 			return wSpy
 		}
-		if (hasWindowWithParent()) {
+		if (hasWindowWithParent) {
 			window.parent.wSpy = wSpy
 			wSpy.initStack = new Error().stack
 			return wSpy
