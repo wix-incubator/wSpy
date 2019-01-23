@@ -10,7 +10,7 @@
     "test": "jasmine",
     "lint": "./node_modules/.bin/eslint .",
     "ci": "npm run lint && npm run test",
-    "build": "webpack"
+    "build": "webpack -p"
   },
   "repository": {
     "type": "git",
@@ -29,6 +29,7 @@
     "eslint": "^5.12.1",
     "eslint-plugin-jasmine": "^2.10.1",
     "jasmine": "^3.3.1",
+    "terser-webpack-plugin": "^1.2.1",
     "webpack": "^4.29.0",
     "webpack-cli": "^3.2.1"
   }

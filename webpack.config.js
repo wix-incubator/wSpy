@@ -1,5 +1,17 @@
+const TerserPlugin = require('terser-webpack-plugin')
 const path = require('path')
-const global = {
+
+// config.module.rules.push({
+// 	test: /\.js$/,
+// 	loader: 'babel-loader',
+// 	exclude: function(modulePath) {
+// 		return /node_modules/.test(modulePath) &&
+//             !/node_modules\/vue-particles/.test(modulePath)
+// 	},
+// 	options: Object.assign({}, this.babelOptions)
+// })
+
+module.exports = {
 	module: {
 		rules: [
 			{
@@ -13,17 +25,22 @@ const global = {
 		fs: 'empty',
 		dns: 'empty'
 	},
-	target: 'node'
+	target: 'node',
+	entry: [
+		'./src/index.js'
+	],
+	output: {
+		path: path.join(__dirname, 'dist'),
+		filename: 'wSpy.min.js'
+	},
+	optimization: {
+		minimizer: [
+			new TerserPlugin({
+				parallel: true,
+				terserOptions: {
+					ecma: 6
+				}
+			})
+		]
+	}
 }
-
-module.exports = [
-	Object.assign({}, global, {
-		entry: [
-			'./src/index.js'
-		],
-		output: {
-			path: path.join(__dirname, 'dist'),
-			filename: 'wSpy.min.js'
-		}
-	})
-]
