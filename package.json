@@ -1,6 +1,6 @@
 {
   "name": "wspy",
-  "version": "2.2.8",
+  "version": "2.2.10",
   "description": "Smart log of sync and async operation queues with stack-traces for debugging",
   "main": "dist/wSpy.min.js",
   "directories": {
@@ -10,7 +10,7 @@
     "test": "jasmine",
     "lint": "./node_modules/.bin/eslint .",
     "ci": "npm run lint && npm run test",
-    "build": "webpack -p"
+    "build": "webpack"
   },
   "repository": {
     "type": "git",
