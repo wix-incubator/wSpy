@@ -1,6 +1,6 @@
 {
   "name": "wspy",
-  "version": "2.2.7",
+  "version": "2.2.8",
   "description": "Smart log of sync and async operation queues with stack-traces for debugging",
   "main": "dist/wSpy.min.js",
   "directories": {
