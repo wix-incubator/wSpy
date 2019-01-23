@@ -22,18 +22,15 @@ function hasWindowWithParent() {
 	return typeof window !== 'undefined' && typeof window.parent !== 'undefined'
 }
 
-function firstSpyLoaded() {
+function getFirstLoadedSpy() {
 	try {
 		return hasWindowWithParent() && typeof window.parent.wSpy !== 'undefined' && window.parent.wSpy
 	} catch (e) {
-		return false
+		return null
 	}
 }
 
-function init(options) {
-	const wSpyOverrideParam = options.wSpyOverrideParam
-	const settings = options.settings
-
+function init({wSpyOverrideParam, settings}) {
 	const shouldSpy = hasWindowWithParent()
 	const wSpyParam = shouldSpy ? wSpyOverrideParam || getSpyParam(window.parent.location.href) : null
 	const wSpy = initSpy.init(shouldSpy ? {
@@ -52,7 +49,7 @@ function init(options) {
 	}
 
 	try {
-		const quickestSpy = firstSpyLoaded()
+		const quickestSpy = getFirstLoadedSpy()
 		if (quickestSpy) {
 			wSpy.initStack = new Error().stack
 			wSpy.logs = quickestSpy.logs || wSpy.logs

@@ -1,16 +1,6 @@
 const TerserPlugin = require('terser-webpack-plugin')
 const path = require('path')
 
-// config.module.rules.push({
-// 	test: /\.js$/,
-// 	loader: 'babel-loader',
-// 	exclude: function(modulePath) {
-// 		return /node_modules/.test(modulePath) &&
-//             !/node_modules\/vue-particles/.test(modulePath)
-// 	},
-// 	options: Object.assign({}, this.babelOptions)
-// })
-
 module.exports = {
 	module: {
 		rules: [
