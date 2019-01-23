@@ -1,6 +1,6 @@
 {
   "name": "wspy",
-  "version": "2.2.3",
+  "version": "2.2.4",
   "description": "Smart log of sync and async operation queues with stack-traces for debugging",
   "main": "dist/wSpy.min.js",
   "directories": {
@@ -25,6 +25,7 @@
   "devDependencies": {
     "@babel/core": "^7.2.2",
     "babel-loader": "^8.0.5",
+    "babel-plugin-transform-es2015-arrow-functions": "^6.22.0",
     "eslint": "^5.12.1",
     "eslint-plugin-jasmine": "^2.10.1",
     "jasmine": "^3.3.1",
