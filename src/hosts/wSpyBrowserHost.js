@@ -24,7 +24,7 @@ function hasWindowWithParent() {
 
 function firstSpyLoaded() {
 	try {
-		return hasWindowWithParent() && typeof window.parent.wSpy !== 'undefined'
+		return hasWindowWithParent() && typeof window.parent.wSpy !== 'undefined' && window.parent.wSpy
 	} catch (e) {
 		return false
 	}
