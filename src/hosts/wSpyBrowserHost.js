@@ -31,6 +31,7 @@ function firstSpyLoaded() {
 }
 
 function init({wSpyOverrideParam, settings}) {
+	const wSpyParam = wSpyOverrideParam || getSpyParam(window.location.href)
 	const wSpy = initSpy.init(hasWindowWithParent() ? {
 		Error: window.Error,
 		memoryUsage: () => window.performance.memory.usedJSHeapSize,
@@ -41,6 +42,10 @@ function init({wSpyOverrideParam, settings}) {
 
 	const noopSpy = {}
 	Object.keys(wSpy).forEach(key => noopSpy[key] = () => {})
+
+	if (!wSpyParam) {
+		return noopSpy
+	}
 
 	try {
 		const quickestSpy = firstSpyLoaded()
