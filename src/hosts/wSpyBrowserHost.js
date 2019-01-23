@@ -37,7 +37,7 @@ function init({wSpyOverrideParam, settings}) {
 		Error: window.Error,
 		memoryUsage: () => window.performance.memory.usedJSHeapSize,
 		frame: window,
-		wSpyParam: wSpyOverrideParam || getSpyParam(window.parent.location.href),
+		wSpyParam,
 		settings: Object.assign({}, defaultSettings, settings)
 	} : {})
 
