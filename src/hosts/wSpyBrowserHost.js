@@ -40,7 +40,7 @@ function init({wSpyOverrideParam, settings}) {
 	} : {})
 
 	const noopSpy = {}
-	Object.keys(wSpy).map(key => noopSpy[key] = () => {})
+	Object.keys(wSpy).forEach(key => noopSpy[key] = () => {})
 
 	try {
 		const quickestSpy = firstSpyLoaded()
