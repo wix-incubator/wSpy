@@ -30,25 +30,36 @@ function getFirstLoadedSpy() {
 	}
 }
 
+function noop() {}
+
+const noopSpy = {
+	init: noop,
+	shouldLog: noop,
+	log: noop,
+	getCallbackName: noop,
+	search: noop,
+	logCallBackRegistration: noop,
+	logCallBackExecution: noop,
+	spyMobx: noop,
+	enabled: noop,
+	isActive: noop
+}
+
 function init({wSpyOverrideParam, settings}) {
-	const shouldSpy = hasWindowWithParent()
-	const wSpyParam = shouldSpy ? wSpyOverrideParam || getSpyParam(window.parent.location.href) : null
-	const wSpy = initSpy.init(shouldSpy ? {
-		Error: window.Error,
-		memoryUsage: () => window.performance.memory.usedJSHeapSize,
-		frame: window,
-		wSpyParam,
-		settings: Object.assign({}, defaultSettings, settings)
-	} : {})
-
-	const noopSpy = {}
-	Object.keys(wSpy).forEach(key => noopSpy[key] = () => {})
-
-	if (!wSpyParam) {
-		return noopSpy
-	}
-
 	try {
+		const shouldSpy = hasWindowWithParent()
+		const wSpyParam = wSpyOverrideParam || getSpyParam(window.parent.location.href)
+		if (!wSpyParam || !shouldSpy) {
+			return noopSpy
+		}
+		const wSpy = initSpy.init({
+			Error: window.Error,
+			memoryUsage: () => window.performance.memory.usedJSHeapSize,
+			frame: window,
+			wSpyParam,
+			settings: Object.assign({}, defaultSettings, settings)
+		})
+
 		const quickestSpy = getFirstLoadedSpy()
 		if (quickestSpy) {
 			wSpy.initStack = new Error().stack
