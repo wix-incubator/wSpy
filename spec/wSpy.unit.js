@@ -3,9 +3,9 @@ const _ = require('lodash')
 const initSpy = require('../src/wSpy')
 
 const nodeHost = {
-    Error,
-    memoryUsage: () => process.memoryUsage().heapUsed,
-    frame: global
+	Error,
+	memoryUsage: () => process.memoryUsage().heapUsed,
+	frame: global
 }
 
 const settings = {
@@ -20,7 +20,7 @@ const settings = {
 	MAX_LOG_SIZE: 10000,
 	DEFAULT_LOGS_COUNT: 300,
 	GROUP_MIN_LEN: 5,
-	stackFilter: /publicMethodUtils|bundle.js|ActionQueue.js|require.min.js|main-r.min.js|observableDataUtil.js|lodash|mobxDataHandlers.js|react-dom|createEditorStore.js|coreUtils.js|create-react-class.js|redux-libs.js|throttledStore.js|raven.min.js|Object.store.dispatch|react.development/i
+	stackFilter: /bundle.js|ActionQueue.js|require.min.js|lodash|mobxDataHandlers.js|react-dom|createEditorStore.js|create-react-class.js|redux-libs.js|throttledStore.js|raven.min.js|Object.store.dispatch|react.development/i
 }
 
 const wSpySystemProps = ['index', 'time', '_time', 'mem', 'source']

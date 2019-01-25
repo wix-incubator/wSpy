@@ -7,7 +7,7 @@
     "test": "test"
   },
   "scripts": {
-    "test": "jasmine",
+    "test": "jasmine && jest",
     "debug": "node --inspect-brk node_modules/.bin/jasmine",
     "lint": "./node_modules/.bin/eslint .",
     "ci": "npm run lint && npm run test",
@@ -26,11 +26,13 @@
   "devDependencies": {
     "@babel/core": "^7.2.2",
     "@babel/preset-env": "^7.3.1",
+    "babel-core": "^7.0.0-bridge.0",
     "babel-loader": "^8.0.5",
     "babel-plugin-transform-es2015-arrow-functions": "^6.22.0",
     "eslint": "^5.12.1",
     "eslint-plugin-jasmine": "^2.10.1",
     "jasmine": "^3.3.1",
+    "jest": "^23.6.0",
     "lodash": "^4.17.11",
     "terser-webpack-plugin": "^1.2.1",
     "webpack": "^4.29.0",

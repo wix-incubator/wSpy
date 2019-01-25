@@ -45,6 +45,10 @@ const noopSpy = {
 	isActive: noop
 }
 
+function getUsedMemory(performance) {
+	return performance && performance.memory && performance.memory.usedJSHeapSize
+}
+
 function init({wSpyOverrideParam, settings}) {
 	try {
 		const shouldSpy = hasWindowWithParent()
@@ -54,7 +58,7 @@ function init({wSpyOverrideParam, settings}) {
 		}
 		const wSpy = initSpy.init({
 			Error: window.Error,
-			memoryUsage: () => window.performance.memory.usedJSHeapSize,
+			memoryUsage: () => getUsedMemory(window.performance) || 0,
 			frame: window,
 			wSpyParam,
 			settings: Object.assign({}, defaultSettings, settings)
