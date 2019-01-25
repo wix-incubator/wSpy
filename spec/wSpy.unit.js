@@ -3,9 +3,9 @@ const _ = require('lodash')
 const initSpy = require('../src/wSpy')
 
 const nodeHost = {
-	Error,
-	memoryUsage: () => process.memoryUsage().heapUsed,
-	frame: global
+    Error,
+    memoryUsage: () => process.memoryUsage().heapUsed,
+    frame: global
 }
 
 const settings = {
@@ -20,18 +20,23 @@ const settings = {
 	MAX_LOG_SIZE: 10000,
 	DEFAULT_LOGS_COUNT: 300,
 	GROUP_MIN_LEN: 5,
-	stackFilter: /wSpy|publicMethodUtils|bundle.js|ActionQueue.js|require.min.js|main-r.min.js|observableDataUtil.js|lodash|mobxDataHandlers.js|react-dom|createEditorStore.js|coreUtils.js|create-react-class.js|redux-libs.js|throttledStore.js|raven.min.js|Object.store.dispatch|react.development/i
+	stackFilter: /publicMethodUtils|bundle.js|ActionQueue.js|require.min.js|main-r.min.js|observableDataUtil.js|lodash|mobxDataHandlers.js|react-dom|createEditorStore.js|coreUtils.js|create-react-class.js|redux-libs.js|throttledStore.js|raven.min.js|Object.store.dispatch|react.development/i
 }
 
 const wSpySystemProps = ['index', 'time', '_time', 'mem', 'source']
 
 describe('wSpy', () => {
-	function getSpyWithParam(param) {
-		return initSpy.init({...nodeHost, wSpyParam: param, settings})
+	function someFunc() {}
+	function getSpyWithOptions(overrideParam, overrideSettings) {
+		return initSpy.init({
+			...nodeHost,
+			wSpyParam: overrideParam,
+			settings: Object.assign({}, overrideSettings, settings)
+		})
 	}
 	describe('log', () => {
 		it('should not log when logName isn\'t on defaults', () => {
-			const wSpy = getSpyWithParam()
+			const wSpy = getSpyWithOptions()
 
 			wSpy.log('operation', [], [])
 
@@ -39,7 +44,7 @@ describe('wSpy', () => {
 		})
 
 		it('should not log when record isn\'t array', () => {
-			const wSpy = getSpyWithParam()
+			const wSpy = getSpyWithOptions()
 
 			wSpy.log('setHook', {}, [])
 
@@ -47,7 +52,7 @@ describe('wSpy', () => {
 		})
 
 		it('should log when record is array, logName is one of defaults and not ignored', () => {
-			const wSpy = getSpyWithParam()
+			const wSpy = getSpyWithOptions()
 
 			wSpy.log('setHook', [], [])
 
@@ -55,7 +60,7 @@ describe('wSpy', () => {
 		})
 
 		it('should add new log with param', () => {
-			const wSpy = getSpyWithParam('mobx')
+			const wSpy = getSpyWithOptions('mobx')
 
 			wSpy.log('mobx', [], [])
 
@@ -63,7 +68,7 @@ describe('wSpy', () => {
 		})
 
 		it('should add new logs also when multiple extra params', () => {
-			const wSpy = getSpyWithParam('mobx,ds_GETTER')
+			const wSpy = getSpyWithOptions('mobx,ds_GETTER')
 
 			wSpy.log('mobx', [], [])
 
@@ -75,7 +80,7 @@ describe('wSpy', () => {
 		})
 
 		it('should not log when disabling a logName', () => {
-			const wSpy = getSpyWithParam('-ds_ACTION')
+			const wSpy = getSpyWithOptions('-ds_ACTION')
 
 			wSpy.log('ds_ACTION', [], [])
 
@@ -83,7 +88,7 @@ describe('wSpy', () => {
 		})
 
 		it('should not log when disabling multiple logNames', () => {
-			const wSpy = getSpyWithParam('-setHook,-ds_ACTION')
+			const wSpy = getSpyWithOptions('-setHook,-ds_ACTION')
 
 			wSpy.log('ds_ACTION', [], [])
 
@@ -95,12 +100,34 @@ describe('wSpy', () => {
 		})
 	})
 
+	describe('logCallBackRegistration', () => {
+		it('should log callback registration with correct name', () => {
+			const wSpy = getSpyWithOptions()
+
+			wSpy.logCallBackRegistration(someFunc, 'registerAction', [someFunc.name || someFunc], 'wSpyTest')
+
+			expect(wSpy.logs['registerAction'].length).toBe(1)
+			expect(_.head(wSpy.logs['registerAction'][0])).toBe(someFunc.name)
+		})
+	})
+
+	describe('logCallBackExecution', () => {
+		it('should log callback execution with correct name', () => {
+			const wSpy = getSpyWithOptions()
+
+			wSpy.logCallBackRegistration(someFunc, 'runAction', [someFunc.name || someFunc], 'wSpyTest')
+
+			expect(wSpy.logs['runAction'].length).toBe(1)
+			expect(_.head(wSpy.logs['runAction'][0])).toBe(someFunc.name)
+		})
+	})
+
 	describe('log actions', () => {
 
 		const func = () => null
 
 		it('should log a callback registration', () => {
-			const wSpy = getSpyWithParam()
+			const wSpy = getSpyWithOptions()
 
 			wSpy.logCallBackRegistration(func, 'registerAction', func.name, 'ActionQueue')
 
@@ -108,7 +135,7 @@ describe('wSpy', () => {
 		})
 
 		it('should log a callback execution', () => {
-			const wSpy = getSpyWithParam()
+			const wSpy = getSpyWithOptions()
 
 			wSpy.logCallBackExecution(func, 'runAction', func.name, 'ActionQueue')
 
@@ -119,7 +146,7 @@ describe('wSpy', () => {
 	describe('clear', () => {
 
 		it('should clear all logs', () => {
-			const wSpy = getSpyWithParam()
+			const wSpy = getSpyWithOptions()
 
 			wSpy.log('setHook', [], [])
 
@@ -131,7 +158,7 @@ describe('wSpy', () => {
 
 	describe('search', () => {
 		it('should find a specific log with a string', () => {
-			const wSpy = getSpyWithParam()
+			const wSpy = getSpyWithOptions()
 
 			wSpy.log('setHook', [], [])
 			wSpy.log('dispatch', [], [])
@@ -143,7 +170,7 @@ describe('wSpy', () => {
 		})
 
 		it('should find a specific log with a regex', () => {
-			const wSpy = getSpyWithParam()
+			const wSpy = getSpyWithOptions()
 
 			wSpy.log('setHook', [], [])
 			wSpy.log('worker', [], [])
@@ -153,11 +180,27 @@ describe('wSpy', () => {
 
 			expect(result.length).toBe(2)
 		})
+
+		it('should find by function name', () => {
+			const wSpy = getSpyWithOptions()
+
+			function runSpy(instance, logName) {
+				instance.log(logName, [], [])
+			}
+
+			const logName = 'worker'
+			runSpy(wSpy, logName)
+
+			const result = wSpy.search(/runSpy/)
+
+			expect(result.length).toBe(1)
+			expect(result[0][1]).toEqual(logName)
+		})
 	})
 
 	describe('merged', () => {
 		it('should merge multiple logs', () => {
-			const wSpy = getSpyWithParam()
+			const wSpy = getSpyWithOptions()
 
 			wSpy.log('setHook', [], [])
 			wSpy.log('dispatch', [], [])
@@ -170,7 +213,7 @@ describe('wSpy', () => {
 
 	describe('grouped', () => {
 		it('should group multiple logs', () => {
-			const wSpy = getSpyWithParam()
+			const wSpy = getSpyWithOptions()
 
 			wSpy.log('setHook', [], [])
 			wSpy.log('dispatch', [], [])
@@ -181,9 +224,36 @@ describe('wSpy', () => {
 		})
 	})
 
+	describe('groupedNoMobx', () => {
+		it('should add to group mobx logs', () => {
+			const wSpy = getSpyWithOptions()
+
+			wSpy.log('mobx', [], [])
+			wSpy.log('dispatch', [], [])
+
+			const grouped = wSpy.groupedNoMobx()
+
+			expect(grouped.length).toBe(1)
+		})
+	})
+
+	describe('recent', () => {
+		it('should return only x recent logs', () => {
+			const wSpy = getSpyWithOptions()
+
+			wSpy.log('mobx', [], [])
+			wSpy.log('runAction', [], [])
+			wSpy.log('dispatch', [], [])
+
+			const recent = wSpy.recent(2)
+
+			expect(recent.length).toBe(2)
+		})
+	})
+
 	describe('system props', () => {
 		it('should have all system props in log', () => {
-			const wSpy = getSpyWithParam()
+			const wSpy = getSpyWithOptions()
 
 			wSpy.log('setHook', [], [])
 
