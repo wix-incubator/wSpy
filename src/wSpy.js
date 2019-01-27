@@ -102,9 +102,9 @@ function getSpy({Error, frame, settings, wSpyParam, memoryUsage}) {
 			const countFromEnd = -1 * (count || settings.DEFAULT_LOGS_COUNT)
 			return this.merged().slice(countFromEnd)
 		},
-        enabled() {
-		    return true //only for dev mode
-        },
+		enabled() {
+			return true //only for dev mode
+		},
 		merged(filter) {
 			return [].concat.apply([], Object.keys(this.logs).filter(log => Array.isArray(this.logs[log])).map(module =>
 				this.logs[module].map(arr => {
