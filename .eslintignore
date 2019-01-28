@@ -1,4 +1,4 @@
 ##### wSpy eslint ignored files: #####
 
 ### Auto-generated files while build: ###
-dist/
+#dist/
