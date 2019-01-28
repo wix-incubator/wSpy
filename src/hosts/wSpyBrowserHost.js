@@ -34,7 +34,9 @@ function init({wSpyOverrideParam, settings}) {
 		}
 		const wSpy = initSpy.init({
 			Error: window.Error,
-			memoryUsage: () => getUsedMemory(window.performance) || 0,
+			memoryUsage: function() {
+				return getUsedMemory(window.performance) || 0
+			},
 			frame: window,
 			wSpyParam,
 			settings: Object.assign({}, defaultSettings, settings)
