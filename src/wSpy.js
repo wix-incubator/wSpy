@@ -155,11 +155,11 @@ function getSpy({Error, frame, settings, wSpyParam, memoryUsage}) {
 		},
 		source(takeFrom) {
 			Error.stackTraceLimit = 50
-			const windows = [frame]
-			while (windows[0].parent && windows[0] !== windows[0].parent) {
-				windows.unshift(windows[0].parent)
+			const frames = [frame]
+			while (frames[0].parent && frames[0] !== frames[0].parent) {
+				frames.unshift(frames[0].parent)
 			}
-			let stackTrace = windows.reverse().map(window => new window.Error().stack).join('\n').split(/\r|\n/).map(x => x.trim()).slice(4).
+			let stackTrace = frames.reverse().map(frame => new frame.Error().stack).join('\n').split(/\r|\n/).map(x => x.trim()).slice(4).
 				filter(line => line !== 'Error').
 				filter(line => !settings.stackFilter.test(line))
 			if (takeFrom) {

@@ -7,16 +7,13 @@ function init({wSpyOverrideParam, settings}) {
 		if (!wSpyOverrideParam) {
 			return noopSpy
 		}
-		const wSpy = initSpy.init({
+		return initSpy.init({
 			Error,
 			memoryUsage: () =>  0,
-			frame: self,
+			frame: typeof self !== 'undefined' ? self : {},
 			wSpyParam: wSpyOverrideParam,
 			settings: Object.assign({}, defaultSettings, settings)
 		})
-
-		self.wSpy = wSpy
-		return wSpy
 	} catch (e) {
 		return noopSpy
 	}
