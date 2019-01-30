@@ -11,4 +11,4 @@ yarn.lock
 
 
 ### Auto-generated files while build: ###
-dist/
+#dist/
