@@ -6,6 +6,7 @@ const settings = {
 	includeLogs: 'setHook,registerAction,runAction,worker,applyHook,dispatch',
 	stackFilter: /bundle.js|require.min.js|observableDataUtil.js|lodash|mobxDataHandlers.js|react-dom|createEditorStore.js|create-react-class.js|redux-libs.js|throttledStore.js|raven.min.js|Object.store.dispatch|react.development/i
 }
+
 describe('browserHost', () => {
 	function getSpyFromHost(overrideParam, overrideSettings) {
 		return browserHost.init({
