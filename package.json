@@ -1,6 +1,6 @@
 {
   "name": "wspy",
-  "version": "3.0.10",
+  "version": "3.0.11",
   "description": "Smart log of sync and async operation queues with stack-traces for debugging",
   "main": "dist/index.js",
   "files": [
@@ -11,7 +11,6 @@
   },
   "scripts": {
     "test": "jasmine && jest",
-    "debug": "node --inspect-brk node_modules/.bin/jasmine",
     "lint": "./node_modules/.bin/eslint .",
     "ci": "npm run lint && npm run test",
     "build": "npx babel src --out-dir dist"
