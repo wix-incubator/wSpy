@@ -89,11 +89,21 @@ const wSpy = require('wspy').initBrowserHost({ settings })
 #### Node:
 In node host you don't have any url for wSpy param, so you must init wSpy with overrided param:
 ```
-const wSpyOverrideParam = '&wSpy=moreLog1,-logName2'
+const wSpyParam = '&wSpy=moreLog1,-logName2'
 ```
 Initiate wSpy:
 ```
-const wSpy = require('wspy').initNodeHost({ settings, wSpyOverrideParam })
+const wSpy = require('wspy').initNodeHost({ settings, wSpyParam })
+```
+
+#### Worker:
+In node host you don't have any url for wSpy param, so you must init wSpy with overrided param:
+```
+const wSpyParam = '&wSpy=moreLog1,-logName2'
+```
+Initiate wSpy:
+```
+const wSpy = require('wspy').initNodeHost({ settings, wSpyParam })
 ```
 
 #### Logging

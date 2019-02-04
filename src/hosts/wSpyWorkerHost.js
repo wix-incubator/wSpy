@@ -2,16 +2,16 @@
 const initSpy = require('../wSpy')
 const {defaultSettings, noopSpy} = require('./wSpyDefaultData')
 
-function init({wSpyOverrideParam, settings}) {
+function init({wSpyParam, settings}) {
 	try {
-		if (!wSpyOverrideParam) {
+		if (!wSpyParam) {
 			return noopSpy
 		}
 		return initSpy.init({
 			Error: typeof self !== 'undefined' ? self.Error : {},
 			memoryUsage: () => 0,
 			frame: typeof self !== 'undefined' ? self : {},
-			wSpyParam: wSpyOverrideParam,
+			wSpyParam,
 			settings: Object.assign({}, defaultSettings, settings)
 		})
 	} catch (e) {

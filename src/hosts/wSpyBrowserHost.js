@@ -3,10 +3,7 @@ const initSpy = require('../wSpy')
 const {defaultSettings, noopSpy} = require('./wSpyDefaultData')
 
 function getSpyParam(url) {
-	if (typeof URL !== 'undefined') {
-		const urlObj = new URL(url)
-		return urlObj.searchParams.get('wspy') || urlObj.searchParams.get('wSpy')
-	}
+	return (url.match('[?&]w[sS]py=([^&]+)') || ['', ''])[1]
 }
 
 function hasWindowWithParent() {
@@ -25,10 +22,10 @@ function getUsedMemory(performance) {
 	return performance && performance.memory && performance.memory.usedJSHeapSize
 }
 
-function init({wSpyOverrideParam, settings}) {
+function init({settings}) {
 	try {
 		const shouldSpy = hasWindowWithParent()
-		const wSpyParam = wSpyOverrideParam || getSpyParam(window.parent.location.href)
+		const wSpyParam = getSpyParam(window.parent.location.href)
 		if (!wSpyParam || !shouldSpy) {
 			return noopSpy
 		}
