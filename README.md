@@ -103,7 +103,7 @@ const wSpyParam = '&wSpy=moreLog1,-logName2'
 ```
 Initiate wSpy:
 ```
-const wSpy = require('wspy').initNodeHost({ settings, wSpyParam })
+const wSpy = require('wspy').initWorkerHost({ settings, wSpyParam })
 ```
 
 #### Logging
