@@ -17,6 +17,7 @@ function getSpy({Error, frame, settings, wSpyParam, memoryUsage}) {
 		otherSpies: [],
 		init() {
 			if (!this.includeLogs) {
+				this.wSpyParam = wSpyParam
 				const includeLogsFromParam = (wSpyParam || '').split(',').filter(x => x[0] !== '-').filter(x => x)
 				const excludeLogsFromParam = (wSpyParam || '').split(',').filter(x => x[0] === '-').map(x => x.slice(1))
 				this.includeLogs = settings.includeLogs.split(',').concat(includeLogsFromParam).filter(log => excludeLogsFromParam.indexOf(log) === -1).reduce((acc, log) => {
