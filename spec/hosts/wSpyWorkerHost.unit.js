@@ -1,5 +1,5 @@
 'use strict'
-const nodeHost = require('../src/hosts/wSpyNodeHost')
+const workerHost = require('../../src/hosts/wSpyWorkerHost')
 
 const settings = {
 	moreLogs: 'set',
@@ -7,9 +7,17 @@ const settings = {
 	stackFilter: /bundle.js|require.min.js|lodash|raven.min.js/i
 }
 
-describe('Node Host', () => {
+const mockWorker = {
+	Error
+}
+
+describe('Worker Host', () => {
+	beforeAll(() => {
+		global.self = mockWorker
+	})
+
 	function getSpyFromHost(overrideParam, overrideSettings) {
-		return nodeHost.init({
+		return workerHost.init({
 			wSpyParam: overrideParam,
 			settings: Object.assign({}, overrideSettings, settings)
 		})

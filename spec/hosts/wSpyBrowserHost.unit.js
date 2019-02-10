@@ -1,5 +1,5 @@
 'use strict'
-const browserHost = require('../src/hosts/wSpyBrowserHost')
+const browserHost = require('../../src/hosts/wSpyBrowserHost')
 
 const settings = {
 	moreLogs: 'mobx,action',
