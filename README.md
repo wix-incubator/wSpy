@@ -4,7 +4,7 @@ At debug time, you can query and filter the wspy logs from the debug console usi
 
 wSpy is highly effective in the following cases:
 * debugging complex aynch interactions. E.g, reactive systems, drag & drop, rxjs, and request queues
-* understanding/debuging frameworks that takes control of the flow like react, angular, redux, mobx, IOC etc
+* understanding/debugging frameworks that takes control of the flow like react, angular, redux, mobx, IOC etc
 * understanding/monitoring the flow and timing issues of large/complex systems
 
 wSpy logs are conditional.
@@ -12,7 +12,7 @@ wSpy logs requests are ignored when there is no `&wspy=` param in the url.
 wSpy does not log a record if the log name is not in the url `&wpy=` param or explicitly defined in the `includeLogs` settings.
 
 When logged, log events are enriched with the following data:
-* Log index (used to to merge logs)
+* Log index (used to merge logs)
 * Memory usage
 * stacktrace (source)
 * Time stamp
@@ -43,9 +43,7 @@ Define in your code the settings for wSpy config. If not defined, wSpy would use
 {
     includeLogs: '',             // Default logs for wSpy. Must define it when initiating!
     moreLogs: '',                // Logs that would only work if defined in wSpy param
-    extraIgnoredEvents: [],      // Events not to log.
     MAX_LOG_SIZE: 10000,         // Maximum log size for each log. When reached, wSpy slice the log by half.
-    GROUP_MIN_LEN: 5,            // Default min length for grouped functionality.
     stackFilter: /wSpy/i         // Stacktrace filter using regex. Recommended when working with minified libraries: react-dom, require.min.js etc.
 }
 ```
@@ -135,7 +133,7 @@ const wSpy = require('wspy').initNodeHost({ settings, wSpyParam })
 ```
 
 #### Worker:
-Worker host is bit more tricky, you will need to pass the wSpyParam to the worker and then initialize wSpy:
+Worker host is a bit tricky, you will need to pass the wSpyParam to the worker and then initialize wSpy:
 Initiate wSpy:
 ```
 const wSpy = require('wspy').initWorkerHost({ settings, wSpyParam })
