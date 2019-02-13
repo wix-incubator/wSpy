@@ -1,15 +1,23 @@
-# wSpy:  
-1. [Introduction](#introduction)  
-2. [Getting Started](#getting-started)
-3. [Usage](#usage)
-4. [Debugging](#debugging)
-5. [Troubleshooting](#troubleshooting)
-6. [Contributing](#contributing)
-
 ## Introduction
-Smart log for sync and async operation and operation queues with stack-traces for debugging.
+Wspy is a conditional log system that enrich your logging events with stack-traces, timing, and memory info.
+At debug time, you can query and filter the wspy logs from the debug console using the `wspy.search(...)` command.
 
-wSpy also helps you debug non-debuggable interactions, like drag, long hovering etc.
+wSpy is highly effective in the following cases:
+* debugging complex aynch interactions. E.g, reactive systems, drag & drop, rxjs, and request queues
+* understanding/debuging frameworks that takes control of the flow like react, angular, redux, mobx, IOC etc
+* understanding/monitoring the flow and timing issues of large/complex systems
+
+wSpy logs are conditional.
+wSpy logs requests are ignored when there is no `&wspy=` param in the url.
+wSpy does not log a record if the log name is not in the url `&wpy=` param or explicitly defined in the `includeLogs` settings.
+
+When logged, log events are enriched with the following data:
+* Log index (used to to merge logs)
+* Memory usage
+* stacktrace (source)
+* Time stamp
+
+wSpy can work in a browser and also supports nodeJs and worker hosts.
 
 ## Getting Started:
 1. Add wSpy to your project:  
@@ -20,40 +28,23 @@ wSpy also helps you debug non-debuggable interactions, like drag, long hovering 
     ```
     $ yarn add wspy
     ```
-2. Require `wSpy` in your file:  
+2. Require `wSpy` in your file and initialize it:  
     ```
-    const wSpy = require('wspy')
+    const wSpy = require('wspy').initBrowserHost({ includeLogs: 'myLog' })
     ```
-3. Add logs to main points in your code:
+3. Log your app events:
     ```
-    wSpy.log(logName, [functionName, arguments])
+    wSpy.log('myLog', [functionName, ...arguments])
     ```
 
-
-## Usage
-
-#### Logging system
-With wSpy you can log where ever you want.
-  
-Each log gives you the following:
-* Log name
-* Log index  
-* Memory usage
-* Source (stacktrace)
-* Time (seconds and ms)
-* Record (you can log arguments for functions and view them in each log)
-
-wSpy works with several platforms: Node, browser and worker.
-
-#### wSpy settings:
+## Settings
 Define in your code the settings for wSpy config. If not defined, wSpy would use it own default config:
 ```
 {
     includeLogs: '',             // Default logs for wSpy. Must define it when initiating!
     moreLogs: '',                // Logs that would only work if defined in wSpy param
-    extraIgnoredEvents: [],      // Events not to log
-    MAX_LOG_SIZE: 10000,         // Maximum log count. When reaching, wSpy would start deleting each log for the new to come
-    DEFAULT_LOGS_COUNT: 300,     // Default count for grouped, purge and recent functionalities.
+    extraIgnoredEvents: [],      // Events not to log.
+    MAX_LOG_SIZE: 10000,         // Maximum log size for each log. When reached, wSpy slice the log by half.
     GROUP_MIN_LEN: 5,            // Default min length for grouped functionality.
     stackFilter: /wSpy/i         // Stacktrace filter using regex. Recommended when working with minified libraries: react-dom, require.min.js etc.
 }
@@ -62,15 +53,16 @@ Define in your code the settings for wSpy config. If not defined, wSpy would use
 In your code, define your overrided settings, for example:
 ```
 const wSpySettings = {
-    includeLogs: 'mainPointSystem,actionRunner',
-    stackFilter: /wSpy|react-dom|bundle.js|min.js/i
+    includeLogs: 'actionRunner,message-in',
+    moreLogs: 'dragAndDrop,redux-dispatch,react-render',
+    stackFilter: /wSpy|react-dom/i
 }
 ```
-#### Browser:
-wSpy would be activated if you have wSpy param in your url. The values are `moreLogs` from wSpy config above, for example:  
+#### Browser host
+wSpy is activated only if you have `&wSpy=` param in your url. Optional logs are put in setting `moreLogs`, for example:  
 
 ```
-wSpy=moreLog1,moreLog2
+wSpy=dragAndDrop
 ```
 
 The logs in the url 
@@ -78,7 +70,7 @@ The logs in the url
 You can also omit some logs with `-logName`:
 
 ```
-wSpy=-log1,-log2
+wSpy=myLog1,-actionRunner
 ```
 Initiate with:
 
@@ -86,10 +78,56 @@ Initiate with:
 const wSpy = require('wspy').initBrowserHost({ settings })
 ```
 
-#### Node:
-In node host you don't have any url for wSpy param, so you must init wSpy with overrided param:
+## Debugging with the debug console
+When the app is running you can open the debug console (we use chrome) and interact with wSpy
+#### API
+* Search (filter) all logs:
+  - `wSpy.search('layout')` - would return any logs with layout mention (logNames, stacktraces)
+  - `wSpy.search(/layout|render/)` - search supports also regexes
+* Show all logs together: `wSpy.merged()`
+* Clear all logs: `wSpy.clear()`
+* Show specific log: `wSpy.logs.myLog`
+
+#### Logging specific activity
+To log a specific activity, e.g, dragging 
+* use `wSpy.clear()` 
+* do the activity - drag the mouse
+* see the logs
+
+## Logging registered callback functions:
+Callback functions are used in almost any js framework.
+However, when the callback function is activated, the execution stack does not show the context in which the function was registered.
+To solve this issue, wSpy enriches the execution record with the registration stack.
+To make it happen, you need to use `wSpy.logCallBackRegistration` and `wSpy.logCallBackExecution` as shown in the exmaple below and add it the framework you want to debug.
 ```
-const wSpyParam = '&wSpy=moreLog1,-logName2'
+{
+    register(myFunc) {
+        wSpy.logCallBackRegistration(myFunc, 'register', [])
+        this.callback = myFunc
+    }
+    
+    exec() {
+        wSpy.logCallBackExecution(this.callback, 'exec', [])
+        this.callback()
+    }
+}
+```
+
+## More Hosts
+#### Node:
+In node host you will need to take the `&wspy` param from the command line arguments:
+```
+function getProcessArgument(argName) {
+  for (var i = 0; i < process.argv.length; i++) {
+    var arg = process.argv[i];
+    if (arg.indexOf('-' + argName + ':') == 0) 
+      return arg.substring(arg.indexOf(':') + 1);
+    if (arg == '-' + argName) return true;
+  }
+  return '';
+}
+
+const wSpyParam = getProcessArgument('wspy')
 ```
 Initiate wSpy:
 ```
@@ -97,77 +135,18 @@ const wSpy = require('wspy').initNodeHost({ settings, wSpyParam })
 ```
 
 #### Worker:
-In node host you don't have any url for wSpy param, so you must init wSpy with overrided param:
-```
-const wSpyParam = '&wSpy=moreLog1,-logName2'
-```
+Worker host is bit more tricky, you will need to pass the wSpyParam to the worker and then initialize wSpy:
 Initiate wSpy:
 ```
 const wSpy = require('wspy').initWorkerHost({ settings, wSpyParam })
 ```
 
-#### Logging
-```
-.
-.
-.
-function mainPointSystem(arg1, arg2) {
-    wSpy.log('mainPointSystem', ['mainPointDef', ...arguments])
-    .
-    .
-    .
-}
-```
-#### Actions logging:
-In modern system there are queues and runners for sync / async functions and handlers. `wSpy` gives you a way to log each function registration and execution:
-  
-ActionQueue:
-```
-.
-.
-.
-function actionQueueRegistration(action) {
-    wSpy.logCallBackRegistration(action, 'registerAction', [action.name || action], 'ActionQueue')
-    .
-    .
-    .
-}
-
-function actionQueueExecution(action) {
-    wSpy.logCallBackExecution(action, 'runAction', [action.name || action], 'ActionQueue')
-    .
-    .
-    .
-}
-```
-
 ## Troubleshooting
-Whenever wSpy has failed loading, it returns `noopSpy` - and log on your production code won't do nothing (either log or break).
+When there is no `&wspy=` param, wspy is set to `noopSpy` - in this mode it completely ignores all log requests.
 
-Keep in mind for each new log you're adding, add to `moreLogs` the logName in your wSpy settings config.
+Keep `moreLogs` updated. This way you will be able to keep track of all the available logs.
 
-Log only when needed, making a lot of logs would slow your system when debugging (of course not on production when wSpy isn't activated), and reviewing huge amount of logs isn't efficient.  
-
-## Debugging
-When you have finished adding logs in your system, you can run your code (add the url param if needed) and see your system logs. For example, on browser you can search for wSpy variable the the console, with `wSpy.logs`.
-
-#### Review logs:
-
-* Review your mainPointSystem logs: `wSpy.logs.mainPointSystem`
-* Review whole wSpy logs: `wSpy.merged()`
-* Most of the time you'll have much logs, and for this manner we have `search`:
-  - `wSpy.search('layout')` - would return any logs with layout mention (logNames, stacktraces)
-  - `wSpy.search(/layout|render/)` - search supports also regexes
-* Get recent `x` logs:
-  - `wSpy.recent(50)` - return last 50 logs.
-* Get grouped logs:
-  - `wSpy.grouped()` - 
-* Get purged logs:
-  - `wSpy.purge(50)` - 
-
-#### Clear logs:
-When you have much logs, and want to view only logs from certain point, use `wSpy.clear()` in order to clear any log in wSpy.
-
+You can log anything, `making a lot of logs will not slow your system`. However `make sure you activate just the logs you need` in the url.
 
 ## Contributing
 Contributing are always welcome.
