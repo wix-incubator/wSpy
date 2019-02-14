@@ -1,17 +1,20 @@
-const path = require('path')
+const _path = require('path')
+
+const entry = _path.resolve(__dirname, 'dist/index.js')
+const path = _path.resolve(__dirname, 'dist/package')
 
 module.exports = [{
 	mode: 'development',
-	entry: path.resolve(__dirname, 'dist/index.js'),
+	entry,
 	output: {
-		path: path.resolve(__dirname, 'dist'),
+		path,
 		filename: 'wspy-all-debug.js'
 	}
 },
 {
-	entry: path.resolve(__dirname, 'dist/index.js'),
+	entry,
 	output: {
-		path: path.resolve(__dirname, 'dist'),
+		path,
 		filename: 'wspy-all.js'
 	}
 }]
