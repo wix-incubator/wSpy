@@ -6,3 +6,7 @@ module.exports = {
 	initWorkerHost: options => workerHost.init(options),
 	initNodeHost: options => nodeHost.init(options)
 }
+
+if (typeof self === 'object') {
+	self.initBrowserHost = browserHost && browserHost.init
+}

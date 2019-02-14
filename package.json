@@ -13,7 +13,8 @@
     "test": "jasmine",
     "lint": "./node_modules/.bin/eslint .",
     "ci": "npm run lint && npm run test",
-    "build": "npx babel src --out-dir dist",
+    "webpack": "./node_modules/.bin/webpack .",
+    "build": "npx babel src --out-dir dist && npm run webpack",
     "publishspy": "rm -rf dist/ && npm run build && npm publish"
   },
   "repository": {
@@ -35,6 +36,7 @@
     "eslint-plugin-jasmine": "^2.10.1",
     "jasmine": "^3.3.1",
     "lodash": "^4.17.11",
-    "webpack": "^4.29.3"
+    "webpack": "^4.29.3",
+    "webpack-cli": "^3.2.3"
   }
 }
