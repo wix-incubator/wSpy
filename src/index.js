@@ -8,5 +8,5 @@ module.exports = {
 }
 
 if (typeof self === 'object') {
-	self.initBrowserHost = browserHost && browserHost.init
+	self.initWorkerHost = workerHost && workerHost.init
 }
